@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'theme/app_theme.dart';
+import 'screens/welcome_screen.dart';
+import 'screens/user_info_screen.dart';
+import 'screens/goals_setup_screen.dart';
+import 'screens/tutorial_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/journal_entry_screen.dart';
+import 'screens/past_entries_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,64 +19,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SelfUpgrade',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'SelfUpgrade'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Welcome to SelfUpgrade',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      theme: appTheme,
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const WelcomeScreen(),
+        '/user-info': (context) => const UserInfoScreen(),
+        '/goals-setup': (context) => const GoalsSetupScreen(),
+        '/tutorial': (context) => const TutorialScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/journal-entry': (context) => const JournalEntryScreen(),
+        '/past-entries': (context) => const PastEntriesScreen(),
+      },
     );
   }
 }
