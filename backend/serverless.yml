@@ -1,0 +1,30 @@
+service: selfupgrade-backend
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: dev
+  environment:
+    NODE_ENV: production
+    AUTH0_DOMAIN: ${env:AUTH0_DOMAIN}
+    AUTH0_AUDIENCE: ${env:AUTH0_AUDIENCE}
+    FRONTEND_ORIGIN: ${env:FRONTEND_ORIGIN}
+
+functions:
+  api:
+    handler: src/index.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: any
+          cors: true
+
+package:
+  exclude:
+    - node_modules/**
+  include:
+    - src/**
+
+plugins:
+  - serverless-offline
