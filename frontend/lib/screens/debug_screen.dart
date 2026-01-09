@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import '../services/token_storage.dart';
+import '../config.dart';
 import '../services/journal_service.dart';
 import '../services/goal_service.dart';
 import '../services/user_service.dart';
@@ -85,7 +86,7 @@ class _DebugScreenState extends State<DebugScreen> {
                 ]),
                 const SizedBox(height: 20),
                 _buildSection('Backend Status', [
-                  _buildInfoRow('Backend URL', 'http://localhost:3001'),
+                  _buildInfoRow('Backend URL', kBackendBaseUrl),
                   ElevatedButton(
                     onPressed: _testBackendConnection,
                     child: const Text('Test Backend Connection'),
@@ -195,7 +196,7 @@ class _DebugScreenState extends State<DebugScreen> {
         const SnackBar(content: Text('Testing backend connection...')),
       );
       
-      final uri = Uri.parse('http://localhost:3001/auth/config');
+      final uri = Uri.parse('$kBackendBaseUrl/auth/config');
       final response = await http.get(uri).timeout(const Duration(seconds: 5));
       
       if (mounted) {

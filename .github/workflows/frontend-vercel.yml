@@ -19,7 +19,7 @@ jobs:
       - name: Build web
         run: |
           cd frontend
-          flutter build web --release
+          flutter build web --release --dart-define=BACKEND_BASE_URL=https://selfupgrade.onrender.com
       - name: Deploy to Vercel (static build, preserve Git metadata)
         uses: amondnet/vercel-action@v20
         with:

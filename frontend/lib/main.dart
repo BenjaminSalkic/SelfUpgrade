@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'services/auth_service.dart';
+import 'config.dart';
 import 'services/auth_service_web.dart' if (dart.library.io) 'services/auth_service_stub.dart';
 import 'services/mood_service.dart';
 import 'services/notification_service.dart';
@@ -56,14 +57,14 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) {
-        final svc = AuthService(backendBaseUrl: 'http://localhost:3001');
+        final svc = AuthService(backendBaseUrl: kBackendBaseUrl);
         svc.loadConfig().then((_) async {
           if (svc.apiService != null) {
             SyncService.initialize(svc.apiService!);
             await SyncService.pullFromServer();
           }
         }).catchError((e) {
-          print('Warning: Could not connect to backend at http://localhost:3001');
+          print('Warning: Could not connect to backend at $kBackendBaseUrl');
           print('Auth features will be unavailable until backend is running.');
         });
         return svc;

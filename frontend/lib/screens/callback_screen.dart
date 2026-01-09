@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../config.dart';
 import '../services/user_service.dart';
 import '../services/sync_service.dart';
 import '../services/api_service.dart';
@@ -33,7 +34,7 @@ class _CallbackScreenState extends State<CallbackScreen> {
       final auth0Id = auth0User?['sub'];
       
       if (token != null) {
-        final apiService = ApiService(backendBaseUrl: 'http://localhost:3001');
+        final apiService = ApiService(backendBaseUrl: kBackendBaseUrl);
         SyncService.initialize(apiService);
       }
       
