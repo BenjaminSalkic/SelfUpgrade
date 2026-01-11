@@ -4,6 +4,7 @@ import '../theme/gradient_background.dart';
 import '../models/goal.dart';
 import '../services/goal_service.dart';
 import '../services/sync_service.dart';
+import '../widgets/responsive_container.dart';
 
 class ManageGoalsScreen extends StatefulWidget {
   const ManageGoalsScreen({super.key});
@@ -147,6 +148,8 @@ class _ManageGoalsScreenState extends State<ManageGoalsScreen> {
       appBar: AppBar(title: const Text('Goals')),
       body: GradientBackground(
         child: SafeArea(
+          child: ResponsiveContainer(
+            maxWidth: 800,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -213,6 +216,7 @@ class _ManageGoalsScreenState extends State<ManageGoalsScreen> {
                 ),
               ],
             ),
+          ),
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/notification_service.dart';
 import '../theme/gradient_background.dart';
+import '../widgets/responsive_container.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -128,86 +129,142 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width > 768;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notification Settings'),
         backgroundColor: const Color(0xFF0A0E12),
       ),
       body: GradientBackground(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            const SizedBox(height: 24),
-            
-            _buildNotificationTile(
-              icon: Icons.edit_note,
-              title: 'Daily Journal Reminder',
-              subtitle: 'Get reminded to write every day',
-              enabled: _dailyEnabled,
-              time: _formatTime(_dailyHour, _dailyMinute),
-              onChanged: (value) async {
-                setState(() => _dailyEnabled = value);
-                await _saveAndReschedule();
-              },
-              onTimeTap: () => _selectTime(context, 'daily'),
+        child: ResponsiveContainer(
+          maxWidth: 800,
+          child: ListView(
+            padding: EdgeInsets.symmetric(
+              horizontal: isWide ? 48 : 16,
+              vertical: isWide ? 48 : 24,
             ),
-            
-            const SizedBox(height: 16),
-            
-            _buildNotificationTile(
-              icon: Icons.calendar_today,
-              title: 'Sunday Weekly Review',
-              subtitle: 'Reflect on your week every Sunday',
-              enabled: _sundayEnabled,
-              time: _formatTime(_sundayHour, _sundayMinute),
-              onChanged: (value) async {
-                setState(() => _sundayEnabled = value);
-                await _saveAndReschedule();
-              },
-              onTimeTap: () => _selectTime(context, 'sunday'),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            _buildNotificationTile(
-              icon: Icons.flag,
-              title: 'Goal Check-in',
-              subtitle: 'Daily reminder about your goals',
-              enabled: _goalEnabled,
-              time: _formatTime(_goalHour, _goalMinute),
-              onChanged: (value) async {
-                setState(() => _goalEnabled = value);
-                await _saveAndReschedule();
-              },
-              onTimeTap: () => _selectTime(context, 'goal'),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            _buildNotificationTile(
-              icon: Icons.local_fire_department,
-              title: 'Streak Notifications',
-              subtitle: 'Celebrate your journaling streaks',
-              enabled: _streakEnabled,
-              onChanged: (value) async {
-                setState(() => _streakEnabled = value);
-                await _saveAndReschedule();
-              },
-            ),
-            
-            const SizedBox(height: 16),
-            
-            _buildNotificationTile(
-              icon: Icons.psychology,
-              title: 'Smart Reminders',
-              subtitle: 'Get notified if you haven\'t journaled in a while',
-              enabled: _smartEnabled,
-              onChanged: (value) async {
-                setState(() => _smartEnabled = value);
-                await _saveAndReschedule();
-              },
-            ),
-          ],
+            children: [
+              if (isWide) ...[
+                const Text(
+                  'Manage Your Reminders',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF4EF4C0),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Configure when and how you want to be reminded to journal.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey.shade400,
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Timed Reminders Section
+              if (isWide)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    'Scheduled Reminders',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade300,
+                    ),
+                  ),
+                ),
+
+              _buildNotificationTile(
+                icon: Icons.edit_note,
+                title: 'Daily Journal Reminder',
+                subtitle: 'Get reminded to write every day',
+                enabled: _dailyEnabled,
+                time: _formatTime(_dailyHour, _dailyMinute),
+                onChanged: (value) async {
+                  setState(() => _dailyEnabled = value);
+                  await _saveAndReschedule();
+                },
+                onTimeTap: () => _selectTime(context, 'daily'),
+              ),
+
+              const SizedBox(height: 16),
+
+              _buildNotificationTile(
+                icon: Icons.calendar_today,
+                title: 'Sunday Weekly Review',
+                subtitle: 'Reflect on your week every Sunday',
+                enabled: _sundayEnabled,
+                time: _formatTime(_sundayHour, _sundayMinute),
+                onChanged: (value) async {
+                  setState(() => _sundayEnabled = value);
+                  await _saveAndReschedule();
+                },
+                onTimeTap: () => _selectTime(context, 'sunday'),
+              ),
+
+              const SizedBox(height: 16),
+
+              _buildNotificationTile(
+                icon: Icons.flag,
+                title: 'Goal Check-in',
+                subtitle: 'Daily reminder about your goals',
+                enabled: _goalEnabled,
+                time: _formatTime(_goalHour, _goalMinute),
+                onChanged: (value) async {
+                  setState(() => _goalEnabled = value);
+                  await _saveAndReschedule();
+                },
+                onTimeTap: () => _selectTime(context, 'goal'),
+              ),
+
+              SizedBox(height: isWide ? 40 : 24),
+
+              // Smart Reminders Section
+              if (isWide)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    'Smart Notifications',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade300,
+                    ),
+                  ),
+                ),
+
+              _buildNotificationTile(
+                icon: Icons.local_fire_department,
+                title: 'Streak Notifications',
+                subtitle: 'Celebrate your journaling streaks',
+                enabled: _streakEnabled,
+                onChanged: (value) async {
+                  setState(() => _streakEnabled = value);
+                  await _saveAndReschedule();
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              _buildNotificationTile(
+                icon: Icons.psychology,
+                title: 'Smart Reminders',
+                subtitle: 'Get notified if you haven\'t journaled in a while',
+                enabled: _smartEnabled,
+                onChanged: (value) async {
+                  setState(() => _smartEnabled = value);
+                  await _saveAndReschedule();
+                },
+              ),
+
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );
@@ -225,40 +282,73 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF0A0E10),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: enabled ? const Color(0xFF4EF4C0).withOpacity(0.3) : const Color(0xFF2A2D35),
           width: 1,
         ),
+        boxShadow: enabled
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF4EF4C0).withOpacity(0.05),
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                ),
+              ]
+            : null,
       ),
       child: Column(
         children: [
-          SwitchListTile(
-            secondary: Icon(icon, color: enabled ? const Color(0xFF4EF4C0) : const Color(0xFF888888)),
-            title: Text(
-              title,
-              style: TextStyle(
-                color: enabled ? const Color(0xFFF3F3F3) : const Color(0xFF888888),
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: SwitchListTile(
+              secondary: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: enabled
+                      ? const Color(0xFF4EF4C0).withOpacity(0.1)
+                      : const Color(0xFF2A2D35).withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: enabled ? const Color(0xFF4EF4C0) : const Color(0xFF888888),
+                  size: 24,
+                ),
               ),
-            ),
-            subtitle: Text(
-              subtitle,
-              style: const TextStyle(
-                color: Color(0xFF888888),
-                fontSize: 13,
+              title: Text(
+                title,
+                style: TextStyle(
+                  color: enabled ? const Color(0xFFF3F3F3) : const Color(0xFF888888),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Color(0xFF888888),
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+              value: enabled,
+              onChanged: onChanged,
+              activeColor: const Color(0xFF4EF4C0),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
             ),
-            value: enabled,
-            onChanged: onChanged,
-            activeColor: const Color(0xFF4EF4C0),
           ),
           if (time != null && enabled)
             InkWell(
               onTap: onTimeTap,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16),
+              ),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                 decoration: const BoxDecoration(
                   border: Border(
                     top: BorderSide(color: Color(0xFF2A2D35), width: 1),
@@ -266,8 +356,15 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.access_time, size: 20, color: Color(0xFF4EF4C0)),
-                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4EF4C0).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.access_time, size: 18, color: Color(0xFF4EF4C0)),
+                    ),
+                    const SizedBox(width: 14),
                     Text(
                       time,
                       style: const TextStyle(
@@ -277,7 +374,14 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                       ),
                     ),
                     const Spacer(),
-                    const Icon(Icons.chevron_right, color: Color(0xFF888888)),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A2D35),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(Icons.chevron_right, color: Color(0xFF888888), size: 20),
+                    ),
                   ],
                 ),
               ),

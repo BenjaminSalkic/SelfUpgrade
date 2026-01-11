@@ -19,10 +19,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
+  bool _sidebarOpen = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-    final List<Widget> _screens = [
+  final List<Widget> _screens = [
     const JournalListView(),
     const JournalEntryNavigator(),
     const ProgressContent(),
@@ -73,18 +74,10 @@ class _HomeScreenState extends State<HomeScreen> {
               const Divider(color: Colors.white12, height: 1),
               ListTile(
                 leading: Icon(Icons.person_outline, color: Colors.grey.shade300),
-                title: Text('Profile', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
+                title: Text('Profile & Goals', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.pushNamed(context, '/profile');
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.flag_outlined, color: Colors.grey.shade300),
-                title: Text('Goals', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/manage-goals');
                 },
               ),
               ListTile(
@@ -169,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: _screens[_selectedIndex],
       ),
       bottomNavigationBar: NavigationBar(
-        indicatorColor: Colors.transparent,
+        indicatorColor: const Color(0xFF4CEEBB),
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
           if (index == 1) {
@@ -184,21 +177,21 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           }
         },
-          destinations: const [
+        destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined, color: Colors.grey),
+            selectedIcon: Icon(Icons.home, color: Color(0xFF0A0E10)),
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.edit_outlined),
-            selectedIcon: Icon(Icons.edit),
+            icon: Icon(Icons.edit_outlined, color: Colors.grey),
+            selectedIcon: Icon(Icons.edit, color: Color(0xFF0A0E10)),
             label: 'New Entry',
           ),
           NavigationDestination(
-            icon: Icon(Icons.show_chart_outlined),
-            selectedIcon: Icon(Icons.show_chart),
-              label: 'Progress',
+            icon: Icon(Icons.show_chart_outlined, color: Colors.grey),
+            selectedIcon: Icon(Icons.show_chart, color: Color(0xFF0A0E10)),
+            label: 'Progress',
           ),
         ],
       ),
@@ -231,6 +224,117 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Row(
         children: [
+          // Settings sidebar (pushes content when open)
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: _sidebarOpen ? 280 : 0,
+            child: _sidebarOpen
+                ? Container(
+                    color: const Color(0xFF0A0E10),
+                    child: SafeArea(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Settings',
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).textTheme.headlineSmall?.color ?? Colors.white,
+                                  ),
+                                ),
+                                const Spacer(),
+                                IconButton(
+                                  icon: const Icon(Icons.bug_report, color: Colors.orange),
+                                  tooltip: 'Debug Info',
+                                  onPressed: () {
+                                    setState(() => _sidebarOpen = false);
+                                    Navigator.of(context).pushNamed('/debug');
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Divider(color: Colors.white12, height: 1),
+                          ListTile(
+                            leading: Icon(Icons.person_outline, color: Colors.grey.shade300),
+                            title: Text('Profile & Goals', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
+                            onTap: () {
+                              setState(() => _sidebarOpen = false);
+                              Navigator.pushNamed(context, '/profile');
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.notifications_outlined, color: Colors.grey.shade300),
+                            title: Text('Notifications', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
+                            onTap: () {
+                              setState(() => _sidebarOpen = false);
+                              Navigator.pushNamed(context, '/notification-settings');
+                            },
+                          ),
+                          const Spacer(),
+                          const Divider(color: Colors.white12, height: 1),
+                          Consumer<AuthService>(
+                            builder: (context, authService, _) {
+                              return FutureBuilder<String?>(
+                                future: authService.tokenStorage.getAccessToken(),
+                                builder: (context, snapshot) {
+                                  final hasToken = snapshot.data != null;
+
+                                  if (!hasToken) {
+                                    return ListTile(
+                                      leading: const Icon(Icons.login, color: Colors.green),
+                                      title: const Text('Login with Auth0', style: TextStyle(color: Colors.green, fontSize: 18)),
+                                      subtitle: const Text('Required for cloud sync', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                                      onTap: () async {
+                                        setState(() => _sidebarOpen = false);
+                                        try {
+                                          await authService.login(scheme: 'selfupgrade');
+                                        } catch (e) {
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text('Login failed: $e')),
+                                            );
+                                          }
+                                        }
+                                      },
+                                    );
+                                  }
+
+                                  return ListTile(
+                                    leading: Icon(Icons.logout, color: Colors.grey.shade300),
+                                    title: Text('Logout', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
+                                    onTap: () async {
+                                      await authService.logout();
+
+                                      await UserService.deleteCurrent();
+
+                                      setState(() => _sidebarOpen = false);
+
+                                      if (context.mounted) {
+                                        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                                          MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+                                          (route) => false,
+                                        );
+                                      }
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+          if (_sidebarOpen) const VerticalDivider(thickness: 1, width: 1, color: Colors.white12),
           // Side navigation
           NavigationRail(
             selectedIndex: _selectedIndex,
@@ -249,25 +353,23 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             backgroundColor: const Color(0xFF0A0E10),
             labelType: NavigationRailLabelType.all,
+            indicatorColor: const Color(0xFF4CEEBB),
+            selectedIconTheme: const IconThemeData(
+              color: Color(0xFF0A0E10),
+            ),
+            unselectedIconTheme: const IconThemeData(
+              color: Colors.grey,
+            ),
+            selectedLabelTextStyle: const TextStyle(
+              color: Color(0xFF4CEEBB),
+            ),
             leading: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                children: [
-                  const Text(
-                    'SelfUpgrade',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  IconButton(
-                    icon: const Icon(Icons.settings),
-                    onPressed: () {
-                      _scaffoldKey.currentState!.openEndDrawer();
-                    },
-                  ),
-                ],
+              child: IconButton(
+                icon: Icon(_sidebarOpen ? Icons.close : Icons.settings),
+                onPressed: () {
+                  setState(() => _sidebarOpen = !_sidebarOpen);
+                },
               ),
             ),
             destinations: const [
@@ -300,143 +402,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      endDrawer: Drawer(
-        elevation: 0,
-        backgroundColor: const Color(0xFF0A0E12),
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                child: Row(
-                  children: [
-                    Text(
-                      'Settings',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).textTheme.headlineSmall?.color ?? Colors.white,
-                      ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.bug_report, color: Colors.orange),
-                      tooltip: 'Debug Info',
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pushNamed('/debug');
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(color: Colors.white12, height: 1),
-              ListTile(
-                leading: Icon(Icons.person_outline, color: Colors.grey.shade300),
-                title: Text('Profile', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/profile');
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.flag_outlined, color: Colors.grey.shade300),
-                title: Text('Goals', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/manage-goals');
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.notifications_outlined, color: Colors.grey.shade300),
-                title: Text('Notifications', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/notification-settings');
-                },
-              ),
-              const Spacer(),
-              const Divider(color: Colors.white12, height: 1),
-              Consumer<AuthService>(
-                builder: (context, authService, _) {
-                  return FutureBuilder<String?>(
-                    future: authService.tokenStorage.getAccessToken(),
-                    builder: (context, snapshot) {
-                      final hasToken = snapshot.data != null;
-                      
-                      if (!hasToken) {
-                        return ListTile(
-                          leading: const Icon(Icons.login, color: Colors.green),
-                          title: const Text('Login with Auth0', style: TextStyle(color: Colors.green, fontSize: 18)),
-                          subtitle: const Text('Required for cloud sync', style: TextStyle(color: Colors.grey, fontSize: 14)),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            try {
-                              await authService.login(scheme: 'selfupgrade');
-                            } catch (e) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Login failed: $e')),
-                                );
-                              }
-                            }
-                          },
-                        );
-                      }
-                      
-                      return ListTile(
-                        leading: Icon(Icons.logout, color: Colors.grey.shade300),
-                        title: Text('Logout', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
-                        onTap: () async {
-                          await authService.logout();
-                          
-                          await UserService.deleteCurrent();
-                          
-                          if (context.mounted && Navigator.canPop(context)) {
-                            Navigator.pop(context);
-                          }
-                          
-                          if (context.mounted) {
-                            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                              MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-                              (route) => false,
-                            );
-                          }
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: _selectedIndex == 0 ? Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
-            BoxShadow(
-              color: Color.fromRGBO(78,244,192,0.4),
-              blurRadius: 20,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.pushNamed(context, '/journal-entry');
-          },
-          icon: const Icon(Icons.add),
-          label: const Text('New Entry'),
-        ),
-      ) : null,
     );
   }
+
 }
+
 
 class JournalListView extends StatelessWidget {
   const JournalListView({super.key});

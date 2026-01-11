@@ -753,6 +753,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
             ),
             ),
           ),
+          if (!isWeb)
           Positioned(
             left: 0,
             right: 0,
@@ -788,19 +789,57 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
           ),
         ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 70.0, right: 10.0),
-        child: FloatingActionButton(
-          heroTag: 'entryHelpFab',
-          mini: true,
-          backgroundColor: const Color(0xFF1E1F21),
-          foregroundColor: const Color(0xFFF3F3F3),
-          onPressed: _showMarkdownHelp,
-          child: const Text(
-            '?',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0C0D0F)),
+      floatingActionButton: Stack(
+        children: [
+          if (!isWeb)
+          Positioned(
+            bottom: 70.0,
+            right: 10.0,
+            child: FloatingActionButton(
+              heroTag: 'entryHelpFab',
+              mini: true,
+              backgroundColor: const Color(0xFF1E1F21),
+              foregroundColor: const Color(0xFFF3F3F3),
+              onPressed: _showMarkdownHelp,
+              child: const Text(
+                '?',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0C0D0F)),
+              ),
+            ),
           ),
-        ),
+          if (isWeb)
+          Positioned(
+            bottom: 16.0,
+            right: 16.0,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FloatingActionButton(
+                  heroTag: 'markdownToggle',
+                  mini: false,
+                  backgroundColor: const Color(0xFF1E1F21),
+                  foregroundColor: const Color(0xFF4EF4C0),
+                  onPressed: () => setState(() => _showFormatted = !_showFormatted),
+                  child: Icon(
+                    _showFormatted ? Icons.code : Icons.visibility,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                FloatingActionButton(
+                  heroTag: 'entryHelpFab',
+                  mini: false,
+                  backgroundColor: const Color(0xFF1E1F21),
+                  foregroundColor: const Color(0xFFF3F3F3),
+                  onPressed: _showMarkdownHelp,
+                  child: const Text(
+                    '?',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0C0D0F)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
