@@ -6,9 +6,11 @@ import 'token_storage.dart';
 import 'api_service.dart';
 import 'auth_service_web.dart' if (dart.library.io) 'auth_service_stub.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'notification_service.dart';
 import 'mood_service.dart';
+import 'journal_service.dart';
+import 'goal_service.dart';
+import 'user_service.dart';
 import 'dart:convert' show base64, utf8;
 
 String? _getCapturedHash() {
@@ -190,56 +192,58 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    // Clear tokens
+    // Clear tokens first
     await tokenStorage.clear();
 
     // Cancel any scheduled notifications
     try {
-      // lazy import to avoid circular issues
       await NotificationService.cancelAll();
-    } catch (_) {}
+    } catch (e) {
+      print('Error canceling notifications: $e');
+    }
 
-    // Clear local Hive boxes that store user data so next login starts fresh
+    // Clear all local user data using typed service methods
     try {
-      if (Hive.isBoxOpen('journal_entries')) {
-        await Hive.box('journal_entries').clear();
-      } else {
-        final b = await Hive.openBox('journal_entries');
-        await b.clear();
-        await b.close();
-      }
-    } catch (_) {}
-
-    try {
-      if (Hive.isBoxOpen('goals')) {
-        await Hive.box('goals').clear();
-      } else {
-        final b = await Hive.openBox('goals');
-        await b.clear();
-        await b.close();
-      }
-    } catch (_) {}
+      await JournalService.clearAll();
+      print('Cleared journal entries');
+    } catch (e) {
+      print('Error clearing journal entries: $e');
+    }
 
     try {
-      if (Hive.isBoxOpen('users')) {
-        await Hive.box('users').clear();
-      } else {
-        final b = await Hive.openBox('users');
-        await b.clear();
-        await b.close();
-      }
-    } catch (_) {}
+      await GoalService.clearAll();
+      print('Cleared goals');
+    } catch (e) {
+      print('Error clearing goals: $e');
+    }
 
     try {
-      // MoodService provides a clearAll helper
+      await UserService.clearAll();
+      print('Cleared users');
+    } catch (e) {
+      print('Error clearing users: $e');
+    }
+
+    try {
       await MoodService.clearAll();
-    } catch (_) {}
+      print('Cleared moods');
+    } catch (e) {
+      print('Error clearing moods: $e');
+    }
 
-    // Clear selected goal prefs and other small caches
+    // Clear SharedPreferences caches
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('selected_goal_id');
-    } catch (_) {}
+      // Clear notification settings too
+      await prefs.remove('notifications_daily_enabled');
+      await prefs.remove('notifications_sunday_enabled');
+      await prefs.remove('notifications_goal_enabled');
+      await prefs.remove('notifications_streak_enabled');
+      await prefs.remove('notifications_smart_enabled');
+    } catch (e) {
+      print('Error clearing SharedPreferences: $e');
+    }
 
     notifyListeners();
   }

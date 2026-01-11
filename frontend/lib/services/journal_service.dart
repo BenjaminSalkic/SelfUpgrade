@@ -34,4 +34,8 @@ class JournalService {
   }
 
   static ValueListenable<Box<JournalEntry>> listenable() => _box.listenable();
+
+  static Future<void> clearAll() async {
+    await _box.clear();
+  }
 }

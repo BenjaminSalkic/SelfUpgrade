@@ -34,4 +34,8 @@ class UserService {
   static Future<void> delete(String id) async => await _box.delete(id);
 
   static ValueListenable<Box<User>> listenable() => _box.listenable();
+
+  static Future<void> clearAll() async {
+    await _box.clear();
+  }
 }

@@ -21,5 +21,6 @@ services:
       - key: ENCRYPTION_KEY
         sync: false  
     healthCheckPath: /.well-known/health
+    startCommand: node src/index.js
     instances: 1
     plan: free
