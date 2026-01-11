@@ -103,7 +103,10 @@ class AuthService extends ChangeNotifier {
       return null;
     } else {
       final webAuth = _auth0!.webAuthentication(scheme: scheme);
-      final result = await webAuth.login();
+      final result = await webAuth.login(
+        audience: _config!.audience ?? '',
+        scopes: {'openid', 'profile', 'email', 'offline_access'},
+      );
       if (result.accessToken != null) await tokenStorage.saveAccessToken(result.accessToken!);
       if (result.idToken != null) await tokenStorage.saveIdToken(result.idToken!);
       notifyListeners();
