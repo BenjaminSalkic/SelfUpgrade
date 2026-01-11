@@ -199,21 +199,7 @@ class _ProgressContentState extends State<ProgressContent> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Text('Mood', style: Theme.of(context).textTheme.headlineSmall),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: const Icon(Icons.refresh, color: Color(0xFF4EF4C0), size: 20),
-                          tooltip: 'Sync moods from server',
-                          onPressed: () async {
-                            print('🔄 Manual mood sync triggered');
-                            await SyncService.pullFromServer();
-                            if (mounted) setState(() {});
-                          },
-                        ),
-                      ],
-                    ),
+                    Text('Mood', style: Theme.of(context).textTheme.headlineSmall),
                     Row(
                       children: [
                         IconButton(
@@ -515,10 +501,23 @@ class _ProgressContentState extends State<ProgressContent> {
       for (var g in activeGoals) {
         if (!goalTags.contains(g.id)) {
           allDone = false;
-                Row(
-                  children: [
-                    Text('Mood', style: Theme.of(context).textTheme.headlineSmall),
-                  ],
+          break;
+        }
+      }
+      if (allDone) perfect++;
+    }
+    return perfect;
+  }
+
+  double _computeAverageCompletionPercent(List<JournalEntry> entries, List<Goal> goals) {
+    final activeGoals = goals.where((g) => g.isActive).toList();
+    if (activeGoals.isEmpty) return 0.0;
+    
+    final dayGoals = <String, Set<String>>{};
+    for (var e in entries) {
+      final dateKey = '${e.createdAt.year}-${e.createdAt.month}-${e.createdAt.day}';
+      dayGoals.putIfAbsent(dateKey, () => <String>{});
+      dayGoals[dateKey]!.addAll(e.goalTags);
     }
     
     if (dayGoals.isEmpty) return 0.0;
