@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:uuid/uuid.dart';
@@ -107,7 +108,8 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
     if (prompts.isEmpty) return;
     
     setState(() {
-      _currentPrompt = prompts[_promptIndex % prompts.length];
+      final random = Random();
+      _currentPrompt = prompts[random.nextInt(prompts.length)];
       _promptIndex++;
       _showPrompt = true;
     });
@@ -123,14 +125,14 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
     
     if (isSunday && hour >= 17) {
       prompts.addAll([
-        '🌟 Weekly Review: What were your biggest wins this week?',
-        '📊 Weekly Review: What lessons did you learn this week?',
-        '🎯 Weekly Review: How did you progress on your goals?',
-        '💭 Weekly Review: What do you want to improve next week?',
-        '⭐ Weekly Review: Rate your week out of 10 and explain why',
-        '🔄 Weekly Review: What patterns did you notice this week?',
-        '💪 Weekly Review: What are you most proud of this week?',
-        '🚀 Weekly Review: What\'s your main focus for next week?',
+        'Weekly Review: What were your biggest wins this week?',
+        'Weekly Review: What lessons did you learn this week?',
+        'Weekly Review: How did you progress on your goals?',
+        'Weekly Review: What do you want to improve next week?',
+        'Weekly Review: Rate your week out of 10 and explain why',
+        'Weekly Review: What patterns did you notice this week?',
+        'Weekly Review: What are you most proud of this week?',
+        'Weekly Review: What\'s your main focus for next week?',
       ]);
     }
     
@@ -713,7 +715,6 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                                             color: Colors.grey.shade700,
                                             fontSize: 17,
                                             height: 1.6,
-                                            fontStyle: FontStyle.italic,
                                           ),
                                         ),
                                       ],
