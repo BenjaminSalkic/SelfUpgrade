@@ -40,14 +40,20 @@ class CreateAccountScreen extends StatelessWidget {
                 ),
                 onPressed: () async {
                   try {
-                    await authService.login(scheme: 'com.selfupgrade.app');
+                    final result = await authService.login(scheme: 'com.selfupgrade.app');
+                    if (result != null && context.mounted) {
+                      // Login successful - navigate to home
+                      Navigator.of(context).pushReplacementNamed('/home');
+                    }
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Authentication service is currently unavailable. Please use "Skip" to continue with local storage only.'),
-                        duration: Duration(seconds: 5),
-                      ),
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Authentication service is currently unavailable. Please use "Skip" to continue with local storage only.'),
+                          duration: Duration(seconds: 5),
+                        ),
+                      );
+                    }
                   }
                 },
               ),
