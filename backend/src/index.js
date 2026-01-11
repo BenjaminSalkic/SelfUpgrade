@@ -413,8 +413,16 @@ app.get('/api/goals', checkJwt, async (req, res) => {
       'SELECT id, title, description, category, is_active, created_at, updated_at FROM goals WHERE user_id=$1 ORDER BY created_at DESC',
       [userId]
     );
+    
+    // Decrypt sensitive fields
+    const decryptedGoals = goals.rows.map(goal => ({
+      ...goal,
+      title: decrypt(goal.title),
+      description: decrypt(goal.description)
+    }));
+    
     client.release();
-    res.json({ data: goals.rows });
+    res.json({ data: decryptedGoals });
   } catch (e) {
     handleError(res, e, 'get goals');
   }
@@ -449,12 +457,23 @@ app.post('/api/goals', checkJwt, goalValidation, handleValidationErrors, async (
     const sanitized = sanitizeInput(req.body);
     const { id, title, description, category, is_active } = sanitized;
 
+    const encryptedTitle = encrypt(title);
+    const encryptedDescription = encrypt(description);
+
     const insert = await client.query(
       'INSERT INTO goals (id, user_id, title, description, category, is_active) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, title, description, category, is_active, created_at, updated_at',
-      [id, userId, title, description, category, is_active !== false]
+      [id, userId, encryptedTitle, encryptedDescription, category, is_active !== false]
     );
+    
+    // Decrypt before returning
+    const decryptedGoal = {
+      ...insert.rows[0],
+      title: decrypt(insert.rows[0].title),
+      description: decrypt(insert.rows[0].description)
+    };
+    
     client.release();
-    res.status(201).json({ data: insert.rows[0] });
+    res.status(201).json({ data: decryptedGoal });
   } catch (e) {
     handleError(res, e, 'create goal');
   }
@@ -470,14 +489,24 @@ app.put('/api/goals/:id', checkJwt, uuidParamValidation, goalValidation, handleV
     const sanitized = sanitizeInput(req.body);
     const { title, description, category, is_active } = sanitized;
 
+    const encryptedTitle = encrypt(title);
+    const encryptedDescription = encrypt(description);
+
     const update = await client.query(
       'UPDATE goals SET title=$1, description=$2, category=$3, is_active=$4, updated_at=NOW() WHERE id=$5 AND user_id=$6 RETURNING id, title, description, category, is_active, created_at, updated_at',
-      [title, description, category, is_active, id, userId]
+      [encryptedTitle, encryptedDescription, category, is_active, id, userId]
     );
     client.release();
 
     if (update.rows.length === 0) return res.status(404).json({ error: 'not_found' });
-    res.json({ data: update.rows[0] });
+    
+    const decryptedGoal = {
+      ...update.rows[0],
+      title: decrypt(update.rows[0].title),
+      description: decrypt(update.rows[0].description)
+    };
+    
+    res.json({ data: decryptedGoal });
   } catch (e) {
     handleError(res, e, 'update goal');
   }

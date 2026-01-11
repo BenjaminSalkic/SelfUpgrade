@@ -244,8 +244,8 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Row(
             children: [
-          // Settings sidebar (pushes content when open)
-          AnimatedContainer(
+              // Settings sidebar (pushes content when open)
+              AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             width: _sidebarOpen ? 280 : 0,
             child: _sidebarOpen
@@ -355,8 +355,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 : const SizedBox.shrink(),
           ),
           if (_sidebarOpen) const VerticalDivider(thickness: 1, width: 1, color: Colors.white12),
-          // Side navigation
-          NavigationRail(
+              // Side navigation
+              NavigationRail(
             selectedIndex: _selectedIndex,
             onDestinationSelected: (index) {
               if (index == 1) {
@@ -410,9 +410,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const VerticalDivider(thickness: 1, width: 1),
-          // Main content
-          Expanded(
+              const VerticalDivider(thickness: 1, width: 1),
+              // Main content
+              Expanded(
             child: Stack(
               children: [
                 GradientBackground(
@@ -449,6 +449,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
               ],
             ),
+          ),
+            ],
           ),
         ],
       ),
