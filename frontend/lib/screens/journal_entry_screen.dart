@@ -140,52 +140,52 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
       for (final goal in goals) {
         prompts.addAll([
           'What progress have you made on "${goal.title}"?',
-          'Any updates about ${goal.title}?',
+          'Any updates about "${goal.title}"?',
           'What did you accomplish today toward "${goal.title}"?',
           'How much closer are you to "${goal.title}" than yesterday?',
-          'What\'s the latest with ${goal.title}?',
+          'What\'s the latest with "${goal.title}"?',
           
           'How do you feel about your progress on "${goal.title}"?',
           'Are you excited about "${goal.title}" right now?',
-          'What\'s your energy level for ${goal.title} today?',
+          'What\'s your energy level for "${goal.title}" today?',
           'How confident do you feel about achieving "${goal.title}"?',
           
           'What challenges are you facing with "${goal.title}"?',
-          'What\'s blocking your progress on ${goal.title}?',
+          'What\'s blocking your progress on "${goal.title}"?',
           'What obstacles did you overcome for "${goal.title}"?',
-          'What\'s been harder than expected with ${goal.title}?',
+          'What\'s been harder than expected with "${goal.title}"?',
           'What support do you need for "${goal.title}"?',
           
           'What\'s your next step for "${goal.title}"?',
-          'What\'s one small action you can take on ${goal.title} today?',
+          'What\'s one small action you can take on "${goal.title}" today?',
           'What will you do tomorrow to advance "${goal.title}"?',
-          'What\'s the most important thing to focus on for ${goal.title}?',
+          'What\'s the most important thing to focus on for "${goal.title}"?',
           'When will you work on "${goal.title}" next?',
           
           'What win can you celebrate for "${goal.title}"?',
-          'What went well with ${goal.title} today?',
+          'What went well with "${goal.title}" today?',
           'What are you proud of regarding "${goal.title}"?',
-          'What breakthrough did you have with ${goal.title}?',
+          'What breakthrough did you have with "${goal.title}"?',
           
           'What did you learn while working on "${goal.title}"?',
           'How has "${goal.title}" changed you?',
-          'What surprised you about ${goal.title}?',
+          'What surprised you about "${goal.title}"?',
           'What would you do differently with "${goal.title}"?',
           
           'Why is "${goal.title}" important to you?',
-          'What motivates you to keep working on ${goal.title}?',
+          'What motivates you to keep working on "${goal.title}"?',
           'How will achieving "${goal.title}" change your life?',
-          'What inspired you to start ${goal.title}?',
+          'What inspired you to start "${goal.title}"?',
           
           'How much time did you spend on "${goal.title}" today?',
-          'How consistent have you been with ${goal.title}?',
+          'How consistent have you been with "${goal.title}"?',
           'What\'s your streak for "${goal.title}"?',
-          'When was the last time you worked on ${goal.title}?',
+          'When was the last time you worked on "${goal.title}"?',
           
           'What strategy is working for "${goal.title}"?',
-          'How could you approach ${goal.title} differently?',
+          'How could you approach "${goal.title}" differently?',
           'What resources do you need for "${goal.title}"?',
-          'Who could help you with ${goal.title}?',
+          'Who could help you with "${goal.title}"?',
         ]);
       }
     }
