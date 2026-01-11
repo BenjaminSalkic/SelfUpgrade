@@ -222,6 +222,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildDesktopLayout(BuildContext context) {
     return Scaffold(
+      floatingActionButton: _selectedIndex == 0 ? Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Color.fromRGBO(78,244,192,0.4),
+              blurRadius: 20,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.pushNamed(context, '/journal-entry');
+          },
+          icon: const Icon(Icons.add),
+          label: const Text('New Entry'),
+        ),
+      ) : null,
       body: Row(
         children: [
           // Settings sidebar (pushes content when open)

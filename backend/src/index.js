@@ -261,10 +261,16 @@ app.put('/api/users/me', checkJwt, userValidation, handleValidationErrors, async
     const client = await db.pool.connect();
     const userId = await getOrCreateUserId(client, auth0Id);
 
+    console.log(`[USER PUT] Updating user ${userId}, name: ${name}, email: ${email}`);
+    const encryptedName = encrypt(name);
+    const encryptedEmail = encrypt(email);
+    console.log(`[USER PUT] Name encrypted: ${name} -> ${encryptedName?.substring(0, 50)}...`);
+    console.log(`[USER PUT] Email encrypted: ${email} -> ${encryptedEmail?.substring(0, 50)}...`);
+
     // Encrypt sensitive fields before storing
     const update = await client.query(
       'UPDATE users SET name=$1, email=$2, age=$3, has_completed_onboarding=$4, updated_at=NOW() WHERE id=$5 RETURNING id, auth0_id, name, email, age, has_completed_onboarding, created_at, updated_at',
-      [encrypt(name), encrypt(email), age, has_completed_onboarding, userId]
+      [encryptedName, encryptedEmail, age, has_completed_onboarding, userId]
     );
     client.release();
 
@@ -329,9 +335,13 @@ app.post('/api/journal-entries', checkJwt, journalEntryValidation, handleValidat
     const sanitized = sanitizeInput(req.body);
     const { id, content, goal_tags, mood, date } = sanitized;
 
+    console.log(`[JOURNAL POST] Creating entry for user ${userId}, content length: ${content?.length || 0}`);
+    const encryptedContent = encrypt(content);
+    console.log(`[JOURNAL POST] Content encrypted: ${content?.substring(0, 20)}... -> ${encryptedContent?.substring(0, 50)}...`);
+
     const insert = await client.query(
       'INSERT INTO journal_entries (id, user_id, content, goal_tags, mood, date) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, content, goal_tags, mood, date, created_at, updated_at',
-      [id, userId, encrypt(content), goal_tags || [], mood, date || new Date()]
+      [id, userId, encryptedContent, goal_tags || [], mood, date || new Date()]
     );
     client.release();
 
@@ -352,9 +362,13 @@ app.put('/api/journal-entries/:id', checkJwt, uuidParamValidation, journalEntryV
     const sanitized = sanitizeInput(req.body);
     const { content, goal_tags, mood, date } = sanitized;
 
+    console.log(`[JOURNAL PUT] Updating entry ${id}, content length: ${content?.length || 0}`);
+    const encryptedContent = encrypt(content);
+    console.log(`[JOURNAL PUT] Content encrypted: ${content?.substring(0, 20)}... -> ${encryptedContent?.substring(0, 50)}...`);
+
     const update = await client.query(
       'UPDATE journal_entries SET content=$1, goal_tags=$2, mood=$3, date=$4, updated_at=NOW() WHERE id=$5 AND user_id=$6 RETURNING id, content, goal_tags, mood, date, created_at, updated_at',
-      [encrypt(content), goal_tags || [], mood, date, id, userId]
+      [encryptedContent, goal_tags || [], mood, date, id, userId]
     );
     client.release();
 
@@ -600,9 +614,14 @@ app.use((err, req, res, next) => {
 // ===========================================
 // SERVER STARTUP
 // ===========================================
+const BUILD_VERSION = '2026-01-11-encryption-debug';
+console.log(`[STARTUP] SelfUpgrade Backend v${BUILD_VERSION}`);
+console.log(`[STARTUP] NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`[STARTUP] ENCRYPTION_KEY set: ${!!process.env.ENCRYPTION_KEY}`);
+
 if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
   module.exports.handler = serverless(app);
 } else {
   const port = process.env.PORT || 3001;
-  app.listen(port, () => console.log('Listening on', port));
+  app.listen(port, () => console.log(`[STARTUP] Listening on port ${port}`));
 }

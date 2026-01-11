@@ -2,9 +2,13 @@ const crypto = require('crypto');
 
 // Use environment variable for encryption key, or generate a default for development
 // IMPORTANT: Set ENCRYPTION_KEY in production (must be 32 bytes / 64 hex chars)
+const hasEnvKey = !!process.env.ENCRYPTION_KEY;
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY
   ? Buffer.from(process.env.ENCRYPTION_KEY, 'hex')
   : crypto.scryptSync('default-dev-key-change-in-prod', 'salt', 32);
+
+// Log encryption status on startup
+console.log(`[CRYPTO] Encryption initialized. Using env key: ${hasEnvKey}, Key length: ${ENCRYPTION_KEY.length} bytes`);
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
@@ -16,18 +20,27 @@ const AUTH_TAG_LENGTH = 16;
  * @returns {string} - Encrypted string (iv:authTag:encrypted)
  */
 function encrypt(text) {
-  if (!text || typeof text !== 'string') return text;
+  if (!text || typeof text !== 'string') {
+    console.log(`[CRYPTO] encrypt() skipped - text is empty or not a string: ${typeof text}`);
+    return text;
+  }
 
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv(ALGORITHM, ENCRYPTION_KEY, iv);
+  try {
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const cipher = crypto.createCipheriv(ALGORITHM, ENCRYPTION_KEY, iv);
 
-  let encrypted = cipher.update(text, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
 
-  const authTag = cipher.getAuthTag();
+    const authTag = cipher.getAuthTag();
 
-  // Return iv:authTag:encrypted format
-  return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
+    const result = `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
+    console.log(`[CRYPTO] Encrypted ${text.length} chars -> ${result.length} chars`);
+    return result;
+  } catch (e) {
+    console.error(`[CRYPTO] Encryption failed:`, e.message);
+    return text; // Return original on error
+  }
 }
 
 /**
