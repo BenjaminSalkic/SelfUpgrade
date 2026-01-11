@@ -50,13 +50,18 @@ const authLimiter = rateLimit({
 // Body parsing with size limit to prevent payload attacks
 app.use(express.json({ limit: '1mb' }));
 
+// ===========================================
+// HEALTH CHECK (must be before CORS)
+// ===========================================
+app.get('/.well-known/health', (req, res) => res.json({ ok: true }));
+
 // CORS configuration - require explicit origin in production
 const cors = require('cors');
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN;
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, etc.) in development
-    if (!origin && process.env.NODE_ENV !== 'production') {
+    // Allow requests with no origin (mobile apps, curl, health checks)
+    if (!origin) {
       return callback(null, true);
     }
     // In production, require explicit origin match
@@ -201,8 +206,6 @@ const SENSITIVE_JOURNAL_FIELDS = ['content'];
 // ===========================================
 // PUBLIC ROUTES
 // ===========================================
-app.get('/.well-known/health', (req, res) => res.json({ ok: true }));
-
 app.get('/auth/config', authLimiter, (req, res) => {
   const config = {
     auth0Domain: process.env.AUTH0_DOMAIN || null,
