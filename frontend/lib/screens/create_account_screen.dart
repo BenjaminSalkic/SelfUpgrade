@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../theme/gradient_background.dart';
 import '../services/auth_service.dart';
+import '../services/sync_service.dart';
+import '../services/user_service.dart';
 
 class CreateAccountScreen extends StatelessWidget {
   const CreateAccountScreen({super.key});
@@ -42,8 +44,24 @@ class CreateAccountScreen extends StatelessWidget {
                   try {
                     final result = await authService.login(scheme: 'com.selfupgrade.app');
                     if (result != null && context.mounted) {
-                      // Login successful - navigate to home
-                      Navigator.of(context).pushReplacementNamed('/home');
+                      // Login successful - initialize sync and pull data
+                      if (authService.apiService != null) {
+                        SyncService.initialize(authService.apiService!);
+                        await SyncService.pullFromServer();
+                      }
+                      
+                      // Check if user has completed onboarding
+                      final user = await UserService.getCurrent();
+                      
+                      if (context.mounted) {
+                        if (user != null && user.hasCompletedOnboarding) {
+                          // User exists and has completed onboarding - go to home
+                          Navigator.of(context).pushReplacementNamed('/home');
+                        } else {
+                          // New user or incomplete onboarding - start onboarding flow
+                          Navigator.of(context).pushReplacementNamed('/user-info');
+                        }
+                      }
                     }
                   } catch (e) {
                     if (context.mounted) {

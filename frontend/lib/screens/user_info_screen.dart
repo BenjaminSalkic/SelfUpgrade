@@ -65,7 +65,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         createdAt: existingUser?.createdAt ?? DateTime.now(),
-        hasCompletedOnboarding: true,
+        hasCompletedOnboarding: false,
         auth0Id: _auth0Id,
       );
       UserService.setCurrent(user);

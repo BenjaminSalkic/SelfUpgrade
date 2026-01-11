@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme/gradient_background.dart';
 import '../widgets/responsive_container.dart';
+import '../services/user_service.dart';
+import '../services/sync_service.dart';
+import '../models/user.dart';
 
 class TutorialScreen extends StatefulWidget {
   const TutorialScreen({super.key});
@@ -42,8 +45,25 @@ class _TutorialScreenState extends State<TutorialScreen> {
     super.dispose();
   }
 
-  void _finish() {
-    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+  void _finish() async {
+    // Mark onboarding as complete
+    final user = await UserService.getCurrent();
+    if (user != null) {
+      final updatedUser = User(
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        hasCompletedOnboarding: true,
+        auth0Id: user.auth0Id,
+      );
+      await UserService.saveCurrent(updatedUser);
+      await SyncService.syncUser(updatedUser);
+    }
+    
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    }
   }
 
   @override
