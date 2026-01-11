@@ -7,6 +7,7 @@ import '../services/sync_service.dart';
 import '../models/journal_entry.dart';
 import '../models/goal.dart';
 import '../models/mood.dart';
+import '../widgets/responsive_container.dart';
 import 'journal_entry_screen.dart';
 
 class ProgressScreen extends StatelessWidget {
@@ -78,9 +79,12 @@ class _ProgressContentState extends State<ProgressContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-      child: ValueListenableBuilder(
+    return ResponsiveContainer(
+      maxWidth: 1000,
+      applyPadding: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        child: ValueListenableBuilder(
         valueListenable: JournalService.listenable(),
         builder: (context, box, _) {
           final entries = box.values.toList().cast<JournalEntry>();
@@ -250,8 +254,7 @@ class _ProgressContentState extends State<ProgressContent> {
               ],
             ),
           );
-        },
-      ),
+        },        ),      ),
     );
   }
 

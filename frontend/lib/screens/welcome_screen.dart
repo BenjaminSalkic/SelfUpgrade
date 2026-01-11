@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/gradient_background.dart';
 import '../services/user_service.dart';
+import '../widgets/responsive_container.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -26,6 +27,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
+          child: ResponsiveContainer(
+            maxWidth: 800,
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -80,6 +83,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
               ],
             ),
+          ),
           ),
         ),
       ),

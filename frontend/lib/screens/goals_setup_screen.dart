@@ -4,6 +4,7 @@ import '../theme/gradient_background.dart';
 import '../models/goal.dart';
 import '../services/goal_service.dart';
 import '../services/sync_service.dart';
+import '../widgets/responsive_container.dart';
 
 class GoalsSetupScreen extends StatefulWidget {
   const GoalsSetupScreen({super.key});
@@ -78,6 +79,8 @@ class _GoalsSetupScreenState extends State<GoalsSetupScreen> {
       ),
       body: GradientBackground(
         child: SafeArea(
+          child: ResponsiveContainer(
+            maxWidth: 800,
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -191,6 +194,7 @@ class _GoalsSetupScreenState extends State<GoalsSetupScreen> {
               ),
               ],
             ),
+          ),
           ),
         ),
       ),

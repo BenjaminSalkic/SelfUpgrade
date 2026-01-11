@@ -6,6 +6,7 @@ import '../models/user.dart';
 import '../services/user_service.dart';
 import '../services/auth_service.dart';
 import '../services/sync_service.dart';
+import '../widgets/responsive_container.dart';
 
 
 class UserInfoScreen extends StatefulWidget {
@@ -84,6 +85,8 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
       ),
       body: GradientBackground(
         child: SafeArea(
+        child: ResponsiveContainer(
+          maxWidth: 800,
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Form(
@@ -150,6 +153,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
               ],
             ),
           ),
+        ),
         ),
       ),
     ));

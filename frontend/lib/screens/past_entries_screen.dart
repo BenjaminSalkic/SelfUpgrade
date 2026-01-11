@@ -3,6 +3,7 @@ import 'dart:math';
 import '../services/journal_service.dart';
 import '../models/journal_entry.dart';
 import 'journal_entry_screen.dart';
+import '../widgets/responsive_container.dart';
 
 class PastEntriesScreen extends StatelessWidget {
   const PastEntriesScreen({super.key});
@@ -10,7 +11,10 @@ class PastEntriesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ValueListenableBuilder(
+      body: ResponsiveContainer(
+        maxWidth: 1000,
+        applyPadding: false,
+      child: ValueListenableBuilder(
         valueListenable: JournalService.listenable(),
         builder: (context, box, _) {
           final entries = box.values.toList().reversed.toList().cast<JournalEntry>();
@@ -72,6 +76,7 @@ class PastEntriesScreen extends StatelessWidget {
             },
           );
         },
+      ),
       ),
     );
   }

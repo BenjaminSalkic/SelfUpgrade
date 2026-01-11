@@ -9,6 +9,7 @@ import '../services/goal_service.dart';
 import '../services/sync_service.dart';
 import '../models/mood.dart';
 import '../models/goal.dart';
+import '../widgets/responsive_container.dart';
 
 class JournalEntryScreen extends StatefulWidget {
   final String? entryId;
@@ -675,7 +676,9 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Padding(
+            child: ResponsiveContainer(
+              maxWidth: 900,
+              child: Padding(
               padding: const EdgeInsets.only(top: 80, left: 20, right: 20, bottom: 80),
               child: Container(
                 color: bgColor,
@@ -747,6 +750,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                   ),
                 ),
               ),
+            ),
             ),
           ),
           Positioned(

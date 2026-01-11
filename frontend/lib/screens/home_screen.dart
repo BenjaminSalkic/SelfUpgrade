@@ -6,6 +6,7 @@ import '../services/auth_service.dart';
 import '../services/user_service.dart';
 import '../services/sync_service.dart';
 import '../main.dart';
+import '../widgets/responsive_container.dart';
 import 'journal_entry_screen.dart';
 import 'progress_screen.dart';
 import 'welcome_screen.dart';
@@ -29,6 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = isDesktopLayout(context);
+
+    if (isDesktop) {
+      return _buildDesktopLayout(context);
+    }
+
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: Drawer(
@@ -195,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: Container(
+      floatingActionButton: _selectedIndex == 0 ? Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           boxShadow: const [
@@ -216,7 +223,217 @@ class _HomeScreenState extends State<HomeScreen> {
             label: const Text('New Entry'),
           ),
         ),
+      ) : null,
+    );
+  }
+
+  Widget _buildDesktopLayout(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          // Side navigation
+          NavigationRail(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (index) {
+              if (index == 1) {
+                Navigator.pushNamed(context, '/journal-entry').then((_) {
+                  setState(() {
+                    _selectedIndex = 0;
+                  });
+                });
+              } else {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              }
+            },
+            backgroundColor: const Color(0xFF0A0E10),
+            labelType: NavigationRailLabelType.all,
+            leading: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Column(
+                children: [
+                  const Text(
+                    'SelfUpgrade',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  IconButton(
+                    icon: const Icon(Icons.settings),
+                    onPressed: () {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home),
+                label: Text('Home'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.edit_outlined),
+                selectedIcon: Icon(Icons.edit),
+                label: Text('New Entry'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.show_chart_outlined),
+                selectedIcon: Icon(Icons.show_chart),
+                label: Text('Progress'),
+              ),
+            ],
+          ),
+          const VerticalDivider(thickness: 1, width: 1),
+          // Main content
+          Expanded(
+            child: GradientBackground(
+              child: ResponsiveContainer(
+                maxWidth: 1200,
+                child: _screens[_selectedIndex],
+              ),
+            ),
+          ),
+        ],
       ),
+      endDrawer: Drawer(
+        elevation: 0,
+        backgroundColor: const Color(0xFF0A0E12),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                child: Row(
+                  children: [
+                    Text(
+                      'Settings',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.headlineSmall?.color ?? Colors.white,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.bug_report, color: Colors.orange),
+                      tooltip: 'Debug Info',
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pushNamed('/debug');
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(color: Colors.white12, height: 1),
+              ListTile(
+                leading: Icon(Icons.person_outline, color: Colors.grey.shade300),
+                title: Text('Profile', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/profile');
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.flag_outlined, color: Colors.grey.shade300),
+                title: Text('Goals', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/manage-goals');
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.notifications_outlined, color: Colors.grey.shade300),
+                title: Text('Notifications', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/notification-settings');
+                },
+              ),
+              const Spacer(),
+              const Divider(color: Colors.white12, height: 1),
+              Consumer<AuthService>(
+                builder: (context, authService, _) {
+                  return FutureBuilder<String?>(
+                    future: authService.tokenStorage.getAccessToken(),
+                    builder: (context, snapshot) {
+                      final hasToken = snapshot.data != null;
+                      
+                      if (!hasToken) {
+                        return ListTile(
+                          leading: const Icon(Icons.login, color: Colors.green),
+                          title: const Text('Login with Auth0', style: TextStyle(color: Colors.green, fontSize: 18)),
+                          subtitle: const Text('Required for cloud sync', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            try {
+                              await authService.login(scheme: 'selfupgrade');
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Login failed: $e')),
+                                );
+                              }
+                            }
+                          },
+                        );
+                      }
+                      
+                      return ListTile(
+                        leading: Icon(Icons.logout, color: Colors.grey.shade300),
+                        title: Text('Logout', style: TextStyle(color: Colors.grey.shade300, fontSize: 18)),
+                        onTap: () async {
+                          await authService.logout();
+                          
+                          await UserService.deleteCurrent();
+                          
+                          if (context.mounted && Navigator.canPop(context)) {
+                            Navigator.pop(context);
+                          }
+                          
+                          if (context.mounted) {
+                            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                              MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+                              (route) => false,
+                            );
+                          }
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: _selectedIndex == 0 ? Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Color.fromRGBO(78,244,192,0.4),
+              blurRadius: 20,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.pushNamed(context, '/journal-entry');
+          },
+          icon: const Icon(Icons.add),
+          label: const Text('New Entry'),
+        ),
+      ) : null,
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/gradient_background.dart';
+import '../widgets/responsive_container.dart';
 
 class TutorialScreen extends StatefulWidget {
   const TutorialScreen({super.key});
@@ -50,6 +51,8 @@ class _TutorialScreenState extends State<TutorialScreen> {
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
+        child: ResponsiveContainer(
+          maxWidth: 800,
         child: Column(
           children: [
             Expanded(
@@ -163,6 +166,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
             ),
             const SizedBox(height: 40),
           ],
+        ),
         ),
       ),
     ));
