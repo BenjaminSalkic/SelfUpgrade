@@ -18,6 +18,8 @@ services:
         value: "{{AUTH0_CLIENT_ID}}"
       - key: FRONTEND_ORIGIN
         value: "{{FRONTEND_ORIGIN}}"
+      - key: ENCRYPTION_KEY
+        sync: false  
     healthCheckPath: /.well-known/health
     instances: 1
     plan: free
