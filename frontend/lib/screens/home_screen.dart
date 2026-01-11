@@ -427,17 +427,34 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 
-class JournalListView extends StatelessWidget {
+class JournalListView extends StatefulWidget {
   const JournalListView({super.key});
 
   @override
+  State<JournalListView> createState() => _JournalListViewState();
+}
+
+class _JournalListViewState extends State<JournalListView> {
+  Future<void> _refreshData() async {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    if (authService.apiService != null) {
+      SyncService.initialize(authService.apiService!);
+      await SyncService.pullFromServer();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return RefreshIndicator(
+      onRefresh: _refreshData,
+      child: SafeArea(
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             const SizedBox(height: 16),
             Text(
               _getGreeting(),
@@ -514,13 +531,14 @@ class JournalListView extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          Expanded(
-            child: ValueListenableBuilder(
-              valueListenable: JournalService.listenable(),
-              builder: (context, box, _) {
-                final entries = box.values.toList().reversed.toList();
-                if (entries.isEmpty) {
-                  return Center(
+          ValueListenableBuilder(
+            valueListenable: JournalService.listenable(),
+            builder: (context, box, _) {
+              final entries = box.values.toList().reversed.toList();
+              if (entries.isEmpty) {
+                return SizedBox(
+                  height: 300,
+                  child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -546,14 +564,17 @@ class JournalListView extends StatelessWidget {
                         ),
                       ],
                     ),
-                  );
-                }
+                  ),
+                );
+              }
 
-                return ListView.separated(
-                  padding: EdgeInsets.zero,
-                  itemCount: entries.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (context, idx) {
+              return ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.zero,
+                itemCount: entries.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                itemBuilder: (context, idx) {
                     final e = entries[idx];
                     final content = e.content;
                     final lines = content.split('\n');
@@ -642,6 +663,7 @@ class JournalListView extends StatelessWidget {
             ),
           ),
         ],
+        ),
         ),
       ),
     );

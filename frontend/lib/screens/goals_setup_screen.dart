@@ -81,11 +81,17 @@ class _GoalsSetupScreenState extends State<GoalsSetupScreen> {
         child: SafeArea(
           child: ResponsiveContainer(
             maxWidth: 800,
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: 24.0,
+                right: 24.0,
+                top: 24.0,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 const Text(
                   'What would you like to track?',
                   style: TextStyle(
@@ -142,17 +148,21 @@ class _GoalsSetupScreenState extends State<GoalsSetupScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Expanded(
-                  child: _goals.isEmpty
-                          ? const Center(
-                          child: Text(
-                            'No goals yet. Add your first goal above!',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount: _goals.length,
-                          itemBuilder: (context, index) {
+                _goals.isEmpty
+                        ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32.0),
+                        child: Center(
+                        child: Text(
+                          'No goals yet. Add your first goal above!',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                      )
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _goals.length,
+                        itemBuilder: (context, index) {
                             final goal = _goals[index];
                             return Card(
                               color: const Color(0xFF0A0E12),
@@ -169,7 +179,6 @@ class _GoalsSetupScreenState extends State<GoalsSetupScreen> {
                             );
                           },
                         ),
-                ),
                 const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(
@@ -194,6 +203,7 @@ class _GoalsSetupScreenState extends State<GoalsSetupScreen> {
                 ),
               ),
               ],
+            ),
             ),
           ),
           ),
