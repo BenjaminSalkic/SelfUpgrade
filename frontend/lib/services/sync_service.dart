@@ -28,12 +28,12 @@ class SyncService {
     }
 
     try {
-      final mood = await MoodService.getMood(entry.createdAt);
+      final mood = MoodService.getMood(entry.createdAt);
       final data = {
         'id': entry.id,
         'content': entry.content,
         'goal_tags': entry.goalTags,
-        'mood': mood,
+        'mood': mood?.moodLevel?.toString(),
         'date': entry.date.toIso8601String(),
       };
 
@@ -54,11 +54,11 @@ class SyncService {
     if (_isSyncing) return false;
 
     try {
-      final mood = await MoodService.getMood(entry.createdAt);
+      final mood = MoodService.getMood(entry.createdAt);
       final data = {
         'content': entry.content,
         'goal_tags': entry.goalTags,
-        'mood': mood,
+        'mood': mood?.moodLevel?.toString(),
         'date': entry.date.toIso8601String(),
       };
 
