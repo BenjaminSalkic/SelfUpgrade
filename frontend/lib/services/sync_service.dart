@@ -221,17 +221,24 @@ class SyncService {
 
   static Future<void> pullFromServer() async {
     if (_apiService == null) {
+      print('[SYNC] Cannot pull from server - API service not initialized');
       return;
     }
     if (_isSyncing) {
+      print('[SYNC] Already syncing, skipping...');
       return;
     }
 
+    print('[SYNC] Starting pull from server...');
     _isSyncing = true;
     try {
       final entriesResponse = await _apiService!.get('/api/journal-entries');
       final goalsResponse = await _apiService!.get('/api/goals');
       final userResponse = await _apiService!.get('/api/users/me');
+
+      print('[SYNC] Entries response: ${entriesResponse != null ? "success" : "null"}');
+      print('[SYNC] Goals response: ${goalsResponse != null ? "success" : "null"}');
+      print('[SYNC] User response: ${userResponse != null ? "success" : "null"}');
 
       if (entriesResponse != null && entriesResponse['data'] != null) {
         for (var entryData in entriesResponse['data']) {

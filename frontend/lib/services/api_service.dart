@@ -21,13 +21,18 @@ class ApiService {
     try {
       final uri = Uri.parse('$backendBaseUrl$path');
       final headers = await _authHeaders();
+      print('[API] GET $uri');
+      print('[API] Headers: ${headers.keys.join(", ")}');
       final response = await http.get(uri, headers: headers);
+      print('[API] GET $path - Status: ${response.statusCode}');
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
+      } else {
+        print('[API] GET $path - Error body: ${response.body}');
       }
       return null;
     } catch (e) {
-      print('GET request exception: $e');
+      print('[API] GET $path exception: $e');
       return null;
     }
   }
@@ -37,13 +42,18 @@ class ApiService {
       final uri = Uri.parse('$backendBaseUrl$path');
       final headers = await _authHeaders();
       headers['Content-Type'] = 'application/json';
+      print('[API] POST $uri');
+      print('[API] Headers: ${headers.keys.join(", ")}');
       final response = await http.post(uri, headers: headers, body: jsonEncode(body));
+      print('[API] POST $path - Status: ${response.statusCode}');
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return jsonDecode(response.body);
+      } else {
+        print('[API] POST $path - Error body: ${response.body}');
       }
       return null;
     } catch (e) {
-      print('POST request failed: $e');
+      print('[API] POST $path failed: $e');
       return null;
     }
   }
