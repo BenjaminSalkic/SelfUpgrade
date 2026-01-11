@@ -83,7 +83,7 @@ class _ProgressContentState extends State<ProgressContent> {
       maxWidth: 1000,
       applyPadding: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        padding: const EdgeInsets.fromLTRB(16, 60, 16, 32),
         child: ValueListenableBuilder(
         valueListenable: JournalService.listenable(),
         builder: (context, box, _) {

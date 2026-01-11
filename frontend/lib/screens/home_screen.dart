@@ -146,7 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      extendBodyBehindAppBar: true,
       appBar: _selectedIndex == 2 ? null : AppBar(
         title: const Text('SelfUpgrade'),
         actions: [
@@ -241,8 +240,10 @@ class _HomeScreenState extends State<HomeScreen> {
           label: const Text('New Entry'),
         ),
       ) : null,
-      body: Row(
+      body: Stack(
         children: [
+          Row(
+            children: [
           // Settings sidebar (pushes content when open)
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
@@ -412,11 +413,41 @@ class _HomeScreenState extends State<HomeScreen> {
           const VerticalDivider(thickness: 1, width: 1),
           // Main content
           Expanded(
-            child: GradientBackground(
-              child: ResponsiveContainer(
-                maxWidth: 1200,
-                child: _screens[_selectedIndex],
-              ),
+            child: Stack(
+              children: [
+                GradientBackground(
+                  child: ResponsiveContainer(
+                    maxWidth: 1200,
+                    child: _screens[_selectedIndex],
+                  ),
+                ),
+                // Refresh button for desktop
+                if (_selectedIndex == 0)
+                  Positioned(
+                    top: 20,
+                    right: 20,
+                    child: FloatingActionButton.small(
+                      onPressed: () async {
+                        final authService = Provider.of<AuthService>(context, listen: false);
+                        if (authService.apiService != null) {
+                          SyncService.initialize(authService.apiService!);
+                          await SyncService.pullFromServer();
+                          if (mounted) {
+                            setState(() {});
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Data refreshed'),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      tooltip: 'Refresh data',
+                      child: const Icon(Icons.refresh),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],
@@ -440,6 +471,10 @@ class _JournalListViewState extends State<JournalListView> {
     if (authService.apiService != null) {
       SyncService.initialize(authService.apiService!);
       await SyncService.pullFromServer();
+      // Trigger a rebuild by calling setState if mounted
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -455,21 +490,20 @@ class _JournalListViewState extends State<JournalListView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-            const SizedBox(height: 16),
-            Text(
-              _getGreeting(),
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          const SizedBox(height: 8),
-          Text(
-            _getFormattedDate(),
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 24),
+                Text(
+                  _getGreeting(),
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _getFormattedDate(),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 24),
 
-          ValueListenableBuilder(
-            valueListenable: JournalService.listenable(),
-            builder: (context, box, _) {
+                ValueListenableBuilder(
+                  valueListenable: JournalService.listenable(),
+                  builder: (context, box, _) {
               final entries = box.values.toList().cast().toList();
 
               DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
@@ -529,11 +563,11 @@ class _JournalListViewState extends State<JournalListView> {
             },
           ),
 
-          const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-          ValueListenableBuilder(
-            valueListenable: JournalService.listenable(),
-            builder: (context, box, _) {
+                ValueListenableBuilder(
+                  valueListenable: JournalService.listenable(),
+                  builder: (context, box, _) {
               final entries = box.values.toList().reversed.toList();
               if (entries.isEmpty) {
                 return SizedBox(
@@ -568,13 +602,13 @@ class _JournalListViewState extends State<JournalListView> {
                 );
               }
 
-              return ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.zero,
-                itemCount: entries.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
-                itemBuilder: (context, idx) {
+                return ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  itemCount: entries.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (context, idx) {
                     final e = entries[idx];
                     final content = e.content;
                     final lines = content.split('\n');
@@ -661,9 +695,9 @@ class _JournalListViewState extends State<JournalListView> {
                 );
               },
             ),
+              ],
+            ),
           ),
-        ],
-        ),
         ),
       ),
     );
