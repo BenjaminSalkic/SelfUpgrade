@@ -623,5 +623,5 @@ if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
   module.exports.handler = serverless(app);
 } else {
   const port = process.env.PORT || 3001;
-  app.listen(port, () => console.log(`[STARTUP] Listening on port ${port}`));
+  app.listen(port, '0.0.0.0', () => console.log(`[STARTUP] Listening on port ${port}`));
 }
