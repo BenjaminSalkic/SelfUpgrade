@@ -216,18 +216,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: const Text('Save Info', style: TextStyle(fontSize: 16)),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
                   const Text(
                     'Your Goals',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF4EF4C0),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   Container(
-                    height: 280,
+                    height: 200,
                     decoration: BoxDecoration(
                       color: const Color(0xFF0A0E10).withOpacity(0.3),
                       borderRadius: BorderRadius.circular(12),
@@ -281,7 +281,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             },
                           ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),

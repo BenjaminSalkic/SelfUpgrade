@@ -271,9 +271,21 @@ class NotificationService {
 
   static Future<void> scheduleAll() async {
     await initialize();
-    await scheduleDailyReminder(hour: 20, minute: 0);
-    await scheduleSundayReview(hour: 17, minute: 0);
-    await scheduleGoalReminder(hour: 9, minute: 0);
+    
+    final prefs = await SharedPreferences.getInstance();
+    
+    final dailyHour = prefs.getInt('notifications_daily_hour') ?? 20;
+    final dailyMinute = prefs.getInt('notifications_daily_minute') ?? 0;
+    final sundayHour = prefs.getInt('notifications_sunday_hour') ?? 17;
+    final sundayMinute = prefs.getInt('notifications_sunday_minute') ?? 0;
+    final goalHour = prefs.getInt('notifications_goal_hour') ?? 9;
+    final goalMinute = prefs.getInt('notifications_goal_minute') ?? 0;
+    
+    await cancelAll();
+    
+    await scheduleDailyReminder(hour: dailyHour, minute: dailyMinute);
+    await scheduleSundayReview(hour: sundayHour, minute: sundayMinute);
+    await scheduleGoalReminder(hour: goalHour, minute: goalMinute);
     await checkAndScheduleStreakReminder();
   }
 

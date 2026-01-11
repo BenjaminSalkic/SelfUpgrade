@@ -338,13 +338,13 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _buildMoodButton(1, const Color(0xFFE53E3E)),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               _buildMoodButton(2, const Color(0xFFF59E0B)),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               _buildMoodButton(3, const Color(0xFFEAB308)),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               _buildMoodButton(4, const Color(0xFF84CC16)),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               _buildMoodButton(5, const Color(0xFF14B8A6)),
             ],
           ),
@@ -679,7 +679,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
             child: ResponsiveContainer(
               maxWidth: 900,
               child: Padding(
-              padding: const EdgeInsets.only(top: 80, left: 20, right: 20, bottom: 80),
+              padding: const EdgeInsets.only(top: 120, left: 20, right: 20, bottom: 80),
               child: Container(
                 color: bgColor,
                 child: SingleChildScrollView(
@@ -823,6 +823,15 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                   child: Icon(
                     _showFormatted ? Icons.code : Icons.visibility,
                   ),
+                ),
+                const SizedBox(width: 12),
+                FloatingActionButton(
+                  heroTag: 'goalTagsFab',
+                  mini: false,
+                  backgroundColor: const Color(0xFF1E1F21),
+                  foregroundColor: _selectedGoalTags.isNotEmpty ? const Color(0xFF4EF4C0) : const Color(0xFFF3F3F3),
+                  onPressed: _showGoalTagsPicker,
+                  child: const Icon(Icons.local_offer_outlined),
                 ),
                 const SizedBox(width: 12),
                 FloatingActionButton(

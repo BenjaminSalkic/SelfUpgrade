@@ -104,37 +104,79 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class InitialRouteResolver extends StatelessWidget {
+class InitialRouteResolver extends StatefulWidget {
   const InitialRouteResolver({super.key});
+
+  @override
+  State<InitialRouteResolver> createState() => _InitialRouteResolverState();
+}
+
+class _InitialRouteResolverState extends State<InitialRouteResolver> {
+  bool _isInitializing = true;
+  bool _hasToken = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAndCheckToken();
+  }
+
+  Future<void> _initializeAndCheckToken() async {
+    final authService = Provider.of<AuthService>(context, listen: false);
+
+    // Check for token
+    final token = await authService.tokenStorage.getAccessToken();
+
+    if (token != null) {
+      // Ensure auth config is loaded and SyncService is initialized
+      try {
+        await authService.loadConfig();
+        if (authService.apiService != null) {
+          SyncService.initialize(authService.apiService!);
+          // Pull from server in background - don't block navigation
+          SyncService.pullFromServer();
+        }
+      } catch (e) {
+        print('Warning: Could not initialize sync service: $e');
+      }
+
+      if (mounted) {
+        setState(() {
+          _hasToken = true;
+          _isInitializing = false;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _hasToken = false;
+          _isInitializing = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     if (kIsWeb && getLocationPathname().contains('callback')) {
       return const CallbackScreen();
     }
-    
-    final authService = Provider.of<AuthService>(context, listen: false);
-    
-    return FutureBuilder<String?>(
-      future: authService.tokenStorage.getAccessToken(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        
-        if (snapshot.hasData && snapshot.data != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context).pushReplacementNamed('/home');
-          });
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        
-        return const WelcomeScreen();
-      },
-    );
+
+    if (_isInitializing) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_hasToken) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/home');
+      });
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return const WelcomeScreen();
   }
 }

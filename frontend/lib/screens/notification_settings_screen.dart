@@ -65,16 +65,6 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     await prefs.setInt('notifications_goal_minute', _goalMinute);
     
     await NotificationService.scheduleAll();
-    
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Notification settings saved'),
-          backgroundColor: Color(0xFF4EF4C0),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
   }
 
   Future<void> _selectTime(BuildContext context, String type) async {

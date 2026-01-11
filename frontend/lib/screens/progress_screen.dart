@@ -515,23 +515,10 @@ class _ProgressContentState extends State<ProgressContent> {
       for (var g in activeGoals) {
         if (!goalTags.contains(g.id)) {
           allDone = false;
-          break;
-        }
-      }
-      if (allDone) perfect++;
-    }
-    return perfect;
-  }
-
-  double _computeAverageCompletionPercent(List<JournalEntry> entries, List<Goal> goals) {
-    final activeGoals = goals.where((g) => g.isActive).toList();
-    if (activeGoals.isEmpty) return 0.0;
-    
-    final dayGoals = <String, Set<String>>{};
-    for (var e in entries) {
-      final dateKey = '${e.createdAt.year}-${e.createdAt.month}-${e.createdAt.day}';
-      dayGoals.putIfAbsent(dateKey, () => <String>{});
-      dayGoals[dateKey]!.addAll(e.goalTags);
+                Row(
+                  children: [
+                    Text('Mood', style: Theme.of(context).textTheme.headlineSmall),
+                  ],
     }
     
     if (dayGoals.isEmpty) return 0.0;

@@ -89,16 +89,16 @@ class _GoalsSetupScreenState extends State<GoalsSetupScreen> {
                 const Text(
                   'What would you like to track?',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 const Text(
                   'Add goals you want to achieve. We\'ll prompt you about them when you journal.',
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 12),
                 TextField(
                   controller: _titleController,
                   decoration: const InputDecoration(
@@ -106,7 +106,7 @@ class _GoalsSetupScreenState extends State<GoalsSetupScreen> {
                     border: OutlineInputBorder(),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _descriptionController,
                   decoration: const InputDecoration(
@@ -115,7 +115,7 @@ class _GoalsSetupScreenState extends State<GoalsSetupScreen> {
                   ),
                   maxLines: 2,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
@@ -141,7 +141,7 @@ class _GoalsSetupScreenState extends State<GoalsSetupScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 Expanded(
                   child: _goals.isEmpty
                           ? const Center(
@@ -170,6 +170,7 @@ class _GoalsSetupScreenState extends State<GoalsSetupScreen> {
                           },
                         ),
                 ),
+                const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),

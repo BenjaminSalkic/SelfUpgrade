@@ -5,6 +5,10 @@ import 'package:auth0_flutter/auth0_flutter.dart';
 import 'token_storage.dart';
 import 'api_service.dart';
 import 'auth_service_web.dart' if (dart.library.io) 'auth_service_stub.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'notification_service.dart';
+import 'mood_service.dart';
 import 'dart:convert' show base64, utf8;
 
 String? _getCapturedHash() {
@@ -186,7 +190,57 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    // Clear tokens
     await tokenStorage.clear();
+
+    // Cancel any scheduled notifications
+    try {
+      // lazy import to avoid circular issues
+      await NotificationService.cancelAll();
+    } catch (_) {}
+
+    // Clear local Hive boxes that store user data so next login starts fresh
+    try {
+      if (Hive.isBoxOpen('journal_entries')) {
+        await Hive.box('journal_entries').clear();
+      } else {
+        final b = await Hive.openBox('journal_entries');
+        await b.clear();
+        await b.close();
+      }
+    } catch (_) {}
+
+    try {
+      if (Hive.isBoxOpen('goals')) {
+        await Hive.box('goals').clear();
+      } else {
+        final b = await Hive.openBox('goals');
+        await b.clear();
+        await b.close();
+      }
+    } catch (_) {}
+
+    try {
+      if (Hive.isBoxOpen('users')) {
+        await Hive.box('users').clear();
+      } else {
+        final b = await Hive.openBox('users');
+        await b.clear();
+        await b.close();
+      }
+    } catch (_) {}
+
+    try {
+      // MoodService provides a clearAll helper
+      await MoodService.clearAll();
+    } catch (_) {}
+
+    // Clear selected goal prefs and other small caches
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('selected_goal_id');
+    } catch (_) {}
+
     notifyListeners();
   }
 

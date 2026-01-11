@@ -413,16 +413,17 @@ class JournalListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 60),
-          Text(
-            _getGreeting(),
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            Text(
+              _getGreeting(),
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
           const SizedBox(height: 8),
           Text(
             _getFormattedDate(),
@@ -622,6 +623,7 @@ class JournalListView extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -667,7 +669,7 @@ class JournalListView extends StatelessWidget {
     );
   }
 
-  String _getGreeting() {
+  static String _getGreeting() {
     final hour = DateTime.now().hour;
     if (hour < 12) return 'Good Morning';
     if (hour < 17) return 'Good Afternoon';
