@@ -102,7 +102,7 @@ class NotificationService {
 
     await _notifications.zonedSchedule(
       sundayReviewID,
-      '🌟 Weekly Review Time!',
+      'Weekly Review Time!',
       'What were your biggest wins this week?',
       _nextInstanceOfSunday(reviewHour, reviewMinute),
       const NotificationDetails(
