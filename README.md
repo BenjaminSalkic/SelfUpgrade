@@ -500,11 +500,11 @@ vercel --prod
 
 | Welcome Screen | Journal Entries | Create Entry |
 |:--------------:|:---------------:|:------------:|
-| ![Welcome](./docs/screenshots/welcome.png) | ![Home](./docs/screenshots/home.png) | ![Entry](./docs/screenshots/entry.png) |
+| ![Welcome](./docs/screenshots/Welcome.png) | ![Home](./docs/screenshots/Home.png) | ![Entry](./docs/screenshots/Entry.png) |
 
 | Goals Management | Progress Analytics | Mood Tracking |
 |:----------------:|:------------------:|:-------------:|
-| ![Goals](./docs/screenshots/goals.png) | ![Progress](./docs/screenshots/progress.png) | ![Mood](./docs/screenshots/mood.png) |
+| ![Goals](./docs/screenshots/Goals.png) | ![Progress](./docs/screenshots/Progress.png) | ![Mood](./docs/screenshots/mood.png) |
 
 </div>
 
