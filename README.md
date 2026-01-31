@@ -71,7 +71,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Client Applications                       │
+│                    Client Applications                      │
 ├──────────────┬──────────────┬──────────────┬────────────────┤
 │   iOS App    │ Android App  │   Web App    │  Future: Watch │
 │  (Flutter)   │  (Flutter)   │ (Flutter Web)│      App       │
@@ -89,7 +89,7 @@
                    │ (Pull/Push)    │
                    └───────┬────────┘
                            │
-                    [Internet]
+                       [Internet]
                            │
        ┌───────────────────▼───────────────────┐
        │        Backend API (Express)          │
